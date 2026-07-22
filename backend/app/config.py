@@ -1,13 +1,21 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    POSTGRES_USER: str = "agencydesk"
-    POSTGRES_PASSWORD: str = "agencydesk_secret"
-    POSTGRES_DB: str = "agencydesk_db"
-    POSTGRES_HOST: str = "localhost"
+    PROJECT_NAME: str = "AgencyDesk API"
+    API_V1_STR: str = "/api/v1"
+    SECRET_KEY: str = "super-secret-development-jwt-key-change-in-production"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    
+    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_DB: str = "agencydesk"
     POSTGRES_PORT: int = 5432
-    DATABASE_URL: str = "postgresql+asyncpg://agencydesk:agencydesk_secret@localhost:5432/agencydesk_db"
-    SECRET_KEY: str = "super_secret_jwt_key_for_dev_only"
+
+    @property
+    def DATABASE_URL(self) -> str:
+        return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     class Config:
         env_file = ".env"
