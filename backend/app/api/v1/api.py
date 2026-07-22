@@ -1,7 +1,8 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth
+from app.api.v1.endpoints import auth, tenants, projects
 
 api_router = APIRouter()
 
-# Mount auth routes under /api/v1/auth
 api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+api_router.include_router(tenants.router, prefix="/tenants", tags=["Tenants & Clients"])
+api_router.include_router(projects.router, prefix="/projects", tags=["Projects & Tasks"])

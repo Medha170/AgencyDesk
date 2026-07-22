@@ -3,14 +3,14 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     PROJECT_NAME: str = "AgencyDesk API"
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = "super-secret-development-jwt-key-change-in-production"
+    SECRET_KEY: str = "super_secret_jwt_key_for_dev_only"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     
     POSTGRES_SERVER: str = "localhost"
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_DB: str = "agencydesk"
+    POSTGRES_USER: str = "agencydesk"
+    POSTGRES_PASSWORD: str = "agencydesk_secret"
+    POSTGRES_DB: str = "agencydesk_db"
     POSTGRES_PORT: int = 5432
 
     @property
