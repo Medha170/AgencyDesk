@@ -3,12 +3,9 @@ from app.api.v1.api import api_router
 from app.config import settings
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
-)
+app = FastAPI(title="AgencyDesk API")
 
-# Configure CORS for the frontend dev server
+# Configure CORS
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -16,10 +13,15 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Allow all origins for development; restrict in production
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["Authorization", "Content-Type", "X-Agency-ID", "*"],
+)
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
