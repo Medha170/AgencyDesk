@@ -32,12 +32,15 @@ async def list_task_files(
     """
     List all uploaded files/deliverables attached to a specific task.
     """
-    result = await db.execute(
-        select(TaskFile).where(
-            TaskFile.task_id == task_id,
-            TaskFile.agency_id == current_agency.id
-        )
+    query = select(TaskFile).where(
+        TaskFile.task_id == task_id,
+        TaskFile.agency_id == current_agency.id
     )
+    # If the user is a client_user, filter out internal files!
+    if getattr(current_user, "role", None) == "client_user":
+        query = query.where(TaskFile.is_internal == False)
+
+    result = await db.execute(query)
     return result.scalars().all()
 
 
@@ -186,12 +189,15 @@ async def list_task_comments(
     """
     List all comments on a task scoped to the active agency.
     """
-    result = await db.execute(
-        select(TaskComment).where(
-            TaskComment.task_id == task_id,
-            TaskComment.agency_id == current_agency.id
-        ).order_by(TaskComment.created_at.asc())
+    query = select(TaskComment).where(
+        TaskComment.task_id == task_id,
+        TaskComment.agency_id == current_agency.id
     )
+    # If the user is a client_user, filter out internal comments!
+    if getattr(current_user, "role", None) == "client_user":
+        query = query.where(TaskComment.is_internal == False)
+
+    result = await db.execute(query.order_by(TaskComment.created_at.asc()))
     return result.scalars().all()
 
 
