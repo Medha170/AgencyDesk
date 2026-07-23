@@ -8,7 +8,7 @@ from app.api import deps
 from app.models.tenant import Agency
 from app.models.project import Task, Project
 from app.models.tracking import TimeEntry
-from app.models.user import User, Membership
+from app.models.user import User
 from app.schemas.tracking import TimeEntryCreate, TimeEntryResponse, ProjectHoursSummaryResponse
 
 router = APIRouter()
@@ -42,23 +42,12 @@ async def log_time_entry(
             detail="Task not found in active agency"
         )
 
-    membership_res = await db.execute(
-        select(Membership).where(
-            Membership.user_id == current_user.id,
-            Membership.agency_id == current_agency.id,
-        )
-    )
-    membership = membership_res.scalar_one_or_none()
-    if not membership:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User is not a member of the current agency"
-        )
+    membership_id = getattr(current_user, "active_membership_id", current_user.id)
 
     entry = TimeEntry(
         agency_id=current_agency.id,
         task_id=task_id,
-        membership_id=membership.id,
+        membership_id=membership_id,
         duration_minutes=time_in.duration_minutes,
         note=time_in.note,
         logged_date=time_in.logged_date

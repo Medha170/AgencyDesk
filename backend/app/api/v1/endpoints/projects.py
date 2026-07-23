@@ -69,6 +69,68 @@ async def create_project(
     )
     return result.scalar_one()
 
+@router.get("/{project_id}/tasks", response_model=List[TaskResponse])
+async def list_tasks_for_project(
+    project_id: UUID,
+    current_agency: Agency = Depends(deps.get_current_agency),
+    db: AsyncSession = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Retrieve all tasks for a project in the active tenant agency.
+    """
+    proj_res = await db.execute(
+        select(Project).where(
+            Project.id == project_id,
+            Project.agency_id == current_agency.id
+        )
+    )
+    if not proj_res.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found in current agency"
+        )
+
+    result = await db.execute(
+        select(Task).where(
+            Task.project_id == project_id,
+            Task.agency_id == current_agency.id
+        )
+    )
+    return result.scalars().all()
+
+
+@router.get("/{project_id}/tasks", response_model=List[TaskResponse])
+async def list_tasks_for_project(
+    project_id: UUID,
+    current_agency: Agency = Depends(deps.get_current_agency),
+    db: AsyncSession = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_user)
+):
+    """
+    Retrieve all tasks for a specific project in the active tenant agency.
+    """
+    proj_res = await db.execute(
+        select(Project).where(
+            Project.id == project_id,
+            Project.agency_id == current_agency.id
+        )
+    )
+    if not proj_res.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found in current agency"
+        )
+
+    result = await db.execute(
+        select(Task).where(
+            Task.project_id == project_id,
+            Task.agency_id == current_agency.id
+        )
+    )
+    return result.scalars().all()
+
+
 @router.post("/{project_id}/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 async def create_task_for_project(
     project_id: UUID,
